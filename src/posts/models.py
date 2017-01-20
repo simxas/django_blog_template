@@ -7,7 +7,7 @@ from django.utils import timezone
 from embed_video.fields import EmbedVideoField
 
 def upload_location(instance, filename):
-    # checking if directory field is empty. If yes, then use slug name for naming saved image folder
+    # Checking if directory field is empty. If yes, then use post slug for naming saved image folder
     if instance.directory == "":
         return "{0}/{1}".format(instance.slug, filename)
     else:
@@ -15,7 +15,7 @@ def upload_location(instance, filename):
 
 class PostManager(models.Manager):
     def active(self, *args, **kwargs):
-        # if there is "category" in arguments then use it as an aditional filter to get posts from database
+        # If there is "category" in arguments then use it as an aditional filter to get posts from database
         if "category" in kwargs:
             category = kwargs["category"]
             return super(PostManager, self).filter(categories=category).filter(draft=False).filter(publish__lte=timezone.now())
@@ -39,8 +39,8 @@ class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
     title = models.CharField(max_length=120)
     slug = models.SlugField(unique=True)
-    # directory field will keep original slug in order to use it for future deletion of image
-    # this will allow me to be able to edit slug and posts image deletion will be still working
+    # Directory field will keep original slug in order to use it for future deletion of image.
+    # This will allow me in the future to edit slug and still remove image without problems
     directory = models.CharField(max_length=120, null=True)
     image = models.ImageField(
         upload_to=upload_location,
@@ -87,8 +87,8 @@ def create_slug(instance, new_slug=None):
 def pre_save_post_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = create_slug(instance)
-        # this will be working only for the first time, because for updating model I use "update_fields" in view
-        # and by using that I will exclude directory from updating itself
+        # This will be working only for the first time, because for updating model I use "update_fields" in view
+        # and by using that I will exclude directory from updating itself.
         instance.directory = instance.slug
 
 pre_save.connect(pre_save_post_receiver, sender=Post)
