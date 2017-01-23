@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # my apps
     'posts',
+    # Third party apps
+    'embed_video',
 ]
 
 MIDDLEWARE = [
