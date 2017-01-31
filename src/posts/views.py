@@ -72,8 +72,28 @@ def posts_list(request):
 
 # Post detail view
 def post_detail(request, slug):
+    today = timezone.now().date()
+    instance = get_object_or_404(Post, slug=slug)
+    categories_list = Category.objects.all()
+
+    # searc part
+    queryset_list = Post.objects.active()
+    if request.user.is_staff or request.user.is_superuser:
+        queryset_list = Post.objects.all()
+    query = request.GET.get("q")
+    if query:
+        search_dict = search(request, queryset_list, query)
+        return render(request, search_dict["template"], search_dict["context"])
+
+    if instance.draft or instance.publish > timezone.now().date():
+        if not request.user.is_staff or not request.user.is_superuser:
+            raise Http404
     context = {
-        "title": "post detail",
+        "title": instance.title,
+        "instance": instance,
+        "categories_list": categories_list,
+        "today": today,
+        "slug": slug,
     }
     return render(request, "post_detail.html", context)
 
