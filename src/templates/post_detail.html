@@ -1,1 +1,59 @@
-{{title}}
+{% extends "base.html" %}
+{% load embed_video_tags %}
+
+{% block head_title %}
+    {{ instance.title }} | {{ block.super }}
+{% endblock head_title %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Title -->
+            <h1>{{ instance.title }}</h1>
+            <hr/>
+            <!-- Date/Time -->
+            <p>
+                {% if instance.draft %}<span style="color:red;">Draft |</span>{% endif %}
+                <span class="glyphicon glyphicon-time"></span> {% if instance.publish > today %}
+                <span style="color:red">Future Post</span> |{% endif %} {{ instance.publish }}
+            </p>
+            <hr>
+            <!-- Preview Image -->
+            {% if instance.video_url %}
+                {% video instance.video_url as my_video %}
+                    {% video my_video 'small' %}
+                {% endvideo %}
+            {% elif instance.image %}
+                <img src="{{ instance.image.url }}" class="img-responsive" />
+            {% endif %}
+            <hr>
+            <!-- Post Content -->
+            <p>
+                {{ instance.content|safe }}
+            </p>
+            <hr/>
+            {% if instance.categories %}
+                {% for category in instance.categories.all %}
+                    <a href="{{ category.get_absolute_url }}">{{ category }}{% if instance.categories.count > 1 %} | {% endif %}</a>
+                {% endfor %}
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+                <br/>
+                <br/>
+                <a href="{{ instance.get_absolute_url }}edit" class="btn btn-primary" role="button">Edit</a>
+                <a href="{{ instance.get_absolute_url }}delete" class="btn btn-primary" role="button">Delete</a>
+            {% endif %}
+            <hr/>
+            <!-- Facebook like and share -->
+            <p>
+                <div class="fb-like" data-href="{{ request.build_absolute_uri }}" data-layout="button_count" data-action="like" data-size="small" data-show-faces="false" data-share="true"></div>
+            </p>
+
+            <!-- Facebook comments-->
+            <div class="fb-comments" data-href="{{ request.build_absolute_uri }}" data-numposts="5"></div>
+
+        </div><!-- col-lg-8 -->
+        {% include 'sidebar.html' %}
+    </div><!-- main row -->
+{% endblock content %}
