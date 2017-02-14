@@ -3,6 +3,8 @@ bin/*
 include/*
 lib/*
 share/*
+static_cdn/*
+media_cdn/*
 *.pyc
 .*
 !/.gitignore
